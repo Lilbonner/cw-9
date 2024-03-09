@@ -1,23 +1,28 @@
-import React from 'react';
+import { useState } from 'react';
 import dayjs from 'dayjs';
+import EditTransactionModal from '../TransactionModal/TransactionModalEdit.tsx';
 
-interface Transaction {
-    id: string;
-    createdAt: string;
-    category: string;
-    amount: number;
-}
-
-interface TransactionItemProps {
-    transaction: Transaction;
-    onDelete: (id: string) => void;
-}
-
-const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete }) => {
+const TransactionItem = ({ transaction, onDelete }) => {
     const { id, createdAt, category, amount } = transaction;
+    const [isEditing, setIsEditing] = useState(false);
+
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsEditing(false);
+    };
+
+    const handleSave = (formData) => {
+        setIsEditing(false);
+    };
 
     const handleDelete = () => {
-        onDelete(id);
+        const confirmDelete = window.confirm('Are you sure you want to delete this transaction?');
+        if (confirmDelete) {
+            onDelete(id);
+        }
     };
 
     return (
@@ -28,13 +33,20 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, onDelete
             </div>
             <div className="flex">
                 <p className="mr-32">{amount} KGS</p>
-                <button className="mr-10 material-symbols-outlined" >
+                <button className="mr-10 material-symbols-outlined" onClick={handleEdit}>
                     edit
                 </button>
                 <button className="mr-10 material-symbols-outlined" onClick={handleDelete}>
                     delete
                 </button>
             </div>
+            {isEditing && (
+                <EditTransactionModal
+                    transaction={transaction}
+                    onSave={handleSave}
+                    onClose={handleCloseModal}
+                />
+            )}
         </div>
     );
 };
